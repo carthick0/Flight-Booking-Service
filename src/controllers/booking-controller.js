@@ -13,17 +13,38 @@ async function createBooking(req, res) {
         SuccessResponse.data = response;
         return res.status(StatusCodes.CREATED).json(SuccessResponse);
     } catch (error) {
-        console.error("🔥 Booking Controller Error:", error);
+        console.error(" Booking Controller Error:", error);
 
         ErrorResponse.message = error.message || 'Something went wrong';
         ErrorResponse.error = error.explanation || {};
 
-        // Fix: Use correct field name
+        return res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
+    }
+}
+
+async function createPayment(req, res) {
+    try {
+        const response = await BookingService.createPayment({
+            totalCost: req.body.totalCost,
+            userId: req.body.userId,
+            bookingId: req.body.bookingId
+        });
+
+        SuccessResponse.data = response;
+        return res.status(StatusCodes.CREATED).json(SuccessResponse);
+    } catch (error) {
+        console.error("Booking Controller Error:", error);
+
+        ErrorResponse.message = error.message || 'Something went wrong';
+        ErrorResponse.error = error.explanation || {};
+
+
         return res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
     }
 }
 
 
 module.exports = {
-    createBooking
+    createBooking,
+    createPayment
 };
