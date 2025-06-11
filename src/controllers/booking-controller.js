@@ -11,17 +11,18 @@ async function createBooking(req, res) {
         });
 
         SuccessResponse.data = response;
-
         return res.status(StatusCodes.CREATED).json(SuccessResponse);
     } catch (error) {
+        console.error("🔥 Booking Controller Error:", error);
 
-        return res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
-            success: false,
-            message: error.message || "Something went wrong",
-            error: error.explanation || {}
-        });
+        ErrorResponse.message = error.message || 'Something went wrong';
+        ErrorResponse.error = error.explanation || {};
+
+        // Fix: Use correct field name
+        return res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
     }
 }
+
 
 module.exports = {
     createBooking
