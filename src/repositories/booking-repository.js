@@ -1,6 +1,7 @@
 const CrudRepository = require("./curd-repository");
 
-const { Booking } = require('../models')
+const { Booking } = require('../models');
+const { where, Op } = require("sequelize");
 
 class BookingRepository extends CrudRepository {
     constructor() {
@@ -31,6 +32,29 @@ class BookingRepository extends CrudRepository {
                 id: id
             }
         }, { transaction: transaction });
+        return response;
+    }
+    async cancelOldBookings(timestamp) {
+        const response = await Booking.update({ status: 'CANCELLED' }, {
+            where: {
+                [Op.and]: [{
+                        createdAt: {
+                            [Op.lt]: timestamp
+                        }
+                    },
+                    {
+                        status: {
+                            [Op.ne]: 'BOOKED'
+                        }
+                    },
+                    {
+                        status: {
+                            [Op.ne]: 'CANCELLED'
+                        }
+                    }
+                ]
+            }
+        });
         return response;
     }
 }
